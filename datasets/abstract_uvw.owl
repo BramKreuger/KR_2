@@ -1,0 +1,155 @@
+<?xml version="1.0"?>
+<rdf:RDF xmlns="http://www.semanticweb.org/stefan/ontologies/2020/9/untitled-ontology-9#"
+     xml:base="http://www.semanticweb.org/stefan/ontologies/2020/9/untitled-ontology-9"
+     xmlns:owl="http://www.w3.org/2002/07/owl#"
+     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+     xmlns:xml="http://www.w3.org/XML/1998/namespace"
+     xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#">
+    <owl:Ontology rdf:about="http://www.semanticweb.org/stefan/ontologies/2020/9/untitled-ontology-9"/>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Classes
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://www.semanticweb.org/stefan/ontologies/2020/9/untitled-ontology-9#P -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/stefan/ontologies/2020/9/untitled-ontology-9#P"/>
+    
+
+
+    <!-- http://www.semanticweb.org/stefan/ontologies/2020/9/untitled-ontology-9#Q -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/stefan/ontologies/2020/9/untitled-ontology-9#Q">
+        <rdfs:subClassOf>
+            <owl:Class>
+                <owl:intersectionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="http://www.semanticweb.org/stefan/ontologies/2020/9/untitled-ontology-9#X"/>
+                    <rdf:Description rdf:about="http://www.semanticweb.org/stefan/ontologies/2020/9/untitled-ontology-9#Y"/>
+                </owl:intersectionOf>
+            </owl:Class>
+        </rdfs:subClassOf>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/stefan/ontologies/2020/9/untitled-ontology-9#R -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/stefan/ontologies/2020/9/untitled-ontology-9#R">
+        <owl:equivalentClass>
+            <owl:Class>
+                <owl:intersectionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="http://www.semanticweb.org/stefan/ontologies/2020/9/untitled-ontology-9#P"/>
+                    <owl:Class>
+                        <owl:complementOf rdf:resource="http://www.semanticweb.org/stefan/ontologies/2020/9/untitled-ontology-9#Q"/>
+                    </owl:Class>
+                </owl:intersectionOf>
+            </owl:Class>
+        </owl:equivalentClass>
+        <rdfs:subClassOf>
+            <owl:Class>
+                <owl:complementOf>
+                    <owl:Class>
+                        <owl:intersectionOf rdf:parseType="Collection">
+                            <owl:Class>
+                                <owl:complementOf rdf:resource="http://www.semanticweb.org/stefan/ontologies/2020/9/untitled-ontology-9#S"/>
+                            </owl:Class>
+                            <owl:Class>
+                                <owl:complementOf rdf:resource="http://www.semanticweb.org/stefan/ontologies/2020/9/untitled-ontology-9#V"/>
+                            </owl:Class>
+                        </owl:intersectionOf>
+                    </owl:Class>
+                </owl:complementOf>
+            </owl:Class>
+        </rdfs:subClassOf>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/stefan/ontologies/2020/9/untitled-ontology-9#S -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/stefan/ontologies/2020/9/untitled-ontology-9#S"/>
+    
+
+
+    <!-- http://www.semanticweb.org/stefan/ontologies/2020/9/untitled-ontology-9#U -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/stefan/ontologies/2020/9/untitled-ontology-9#U">
+        <rdfs:subClassOf>
+            <owl:Class>
+                <owl:unionOf rdf:parseType="Collection">
+                    <owl:Class>
+                        <owl:intersectionOf rdf:parseType="Collection">
+                            <rdf:Description rdf:about="http://www.semanticweb.org/stefan/ontologies/2020/9/untitled-ontology-9#P"/>
+                            <owl:Class>
+                                <owl:complementOf rdf:resource="http://www.semanticweb.org/stefan/ontologies/2020/9/untitled-ontology-9#S"/>
+                            </owl:Class>
+                        </owl:intersectionOf>
+                    </owl:Class>
+                    <owl:Class>
+                        <owl:intersectionOf rdf:parseType="Collection">
+                            <rdf:Description rdf:about="http://www.semanticweb.org/stefan/ontologies/2020/9/untitled-ontology-9#R"/>
+                            <owl:Class>
+                                <owl:complementOf rdf:resource="http://www.semanticweb.org/stefan/ontologies/2020/9/untitled-ontology-9#P"/>
+                            </owl:Class>
+                        </owl:intersectionOf>
+                    </owl:Class>
+                </owl:unionOf>
+            </owl:Class>
+        </rdfs:subClassOf>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/stefan/ontologies/2020/9/untitled-ontology-9#V -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/stefan/ontologies/2020/9/untitled-ontology-9#V"/>
+    
+
+
+    <!-- http://www.semanticweb.org/stefan/ontologies/2020/9/untitled-ontology-9#X -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/stefan/ontologies/2020/9/untitled-ontology-9#X">
+        <rdfs:subClassOf>
+            <owl:Class>
+                <owl:intersectionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="http://www.semanticweb.org/stefan/ontologies/2020/9/untitled-ontology-9#S"/>
+                    <owl:Class>
+                        <owl:complementOf rdf:resource="http://www.semanticweb.org/stefan/ontologies/2020/9/untitled-ontology-9#S"/>
+                    </owl:Class>
+                </owl:intersectionOf>
+            </owl:Class>
+        </rdfs:subClassOf>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/stefan/ontologies/2020/9/untitled-ontology-9#Y -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/stefan/ontologies/2020/9/untitled-ontology-9#Y">
+        <rdfs:subClassOf>
+            <owl:Class>
+                <owl:intersectionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="http://www.semanticweb.org/stefan/ontologies/2020/9/untitled-ontology-9#R"/>
+                    <owl:Class>
+                        <owl:complementOf rdf:resource="http://www.semanticweb.org/stefan/ontologies/2020/9/untitled-ontology-9#R"/>
+                    </owl:Class>
+                </owl:intersectionOf>
+            </owl:Class>
+        </rdfs:subClassOf>
+    </owl:Class>
+</rdf:RDF>
+
+
+
+<!-- Generated by the OWL API (version 4.5.9.2019-02-01T07:24:44Z) https://github.com/owlcs/owlapi -->
+

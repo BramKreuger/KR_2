@@ -1,0 +1,6 @@
+Ontology(<http://www.example.com/explanation1>
+SubClassOf(<http://www.semanticweb.org/stefan/ontologies/2020/9/untitled-ontology-9#Q> ObjectIntersectionOf(<http://www.semanticweb.org/stefan/ontologies/2020/9/untitled-ontology-9#X> <http://www.semanticweb.org/stefan/ontologies/2020/9/untitled-ontology-9#Y>))
+EquivalentClasses(<http://www.semanticweb.org/stefan/ontologies/2020/9/untitled-ontology-9#R> ObjectIntersectionOf(<http://www.semanticweb.org/stefan/ontologies/2020/9/untitled-ontology-9#P> ObjectComplementOf(<http://www.semanticweb.org/stefan/ontologies/2020/9/untitled-ontology-9#Q>)) )
+SubClassOf(<http://www.semanticweb.org/stefan/ontologies/2020/9/untitled-ontology-9#U> ObjectUnionOf(ObjectIntersectionOf(<http://www.semanticweb.org/stefan/ontologies/2020/9/untitled-ontology-9#P> ObjectComplementOf(<http://www.semanticweb.org/stefan/ontologies/2020/9/untitled-ontology-9#S>)) ObjectIntersectionOf(<http://www.semanticweb.org/stefan/ontologies/2020/9/untitled-ontology-9#R> ObjectComplementOf(<http://www.semanticweb.org/stefan/ontologies/2020/9/untitled-ontology-9#P>))))
+SubClassOf(<http://www.semanticweb.org/stefan/ontologies/2020/9/untitled-ontology-9#X> ObjectIntersectionOf(<http://www.semanticweb.org/stefan/ontologies/2020/9/untitled-ontology-9#S> ObjectComplementOf(<http://www.semanticweb.org/stefan/ontologies/2020/9/untitled-ontology-9#S>)))
+)
