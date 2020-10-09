@@ -1,4 +1,4 @@
-import os, glob, re
+import os, glob, re, shutil
 
 inputOntology = "datasets/abstract_uvw.owl"
 
@@ -13,6 +13,12 @@ method = "2" #
 
 # Choose the symbols which you want to forget.
 signature = "datasets/signature.txt"
+
+# Remove all eplanation files before beginning
+os.chdir("D:\git\KR_FORGETTING\datasets")
+for file in glob.glob("exp*"):
+    os.remove(file)
+os.chdir("D:\git\KR_FORGETTING")
 
 # 1. PRINT ALL SUBCLASSES (inputOntology):
 # print all subClass statements (explicit and inferred) in the inputOntology
@@ -47,8 +53,7 @@ def parseOMN(file):
     myfile.close()                   # close the file
 
     # 1. loop through string to find >
-    # 2. loop back to find first /, 
-    # 3. remove everything left of > #(split_position)
+    # 2. loop back to find first <, 
     # 4. repeat
 
     split_position = 0
@@ -66,8 +71,8 @@ def parseOMN(file):
 
 # Flattens list, removes doubles, writes the vars into signature.txt
 def extract_varables(list_of_results):
-    flat_list = [item for sublist in list_of_results for item in sublist]    
-    list_wo_doubles = list(dict.fromkeys(flat_list))
+    flat_list = [item for sublist in list_of_results for item in sublist] # flatten   
+    list_wo_doubles = list(dict.fromkeys(flat_list)) 
 
     if os.path.exists("signature.txt"):
         os.remove("signature.txt")
@@ -76,15 +81,28 @@ def extract_varables(list_of_results):
     for var in list_wo_doubles:
         f.write(var + "\n")
     f.close()
-
-    
-
+ 
 os.chdir("D:\git\KR_FORGETTING\datasets")
 all_parsed_results = []
 for file in glob.glob("exp*"):
     all_parsed_results.append(parseOMN(file)) # Extract all the variables from the omn files
 
-extract_varables(all_parsed_results) # Save all variables in the signature.txt
+extract_varables(all_parsed_results) # TODO: extract variables per explanation and save every variable in a seperate file
+os.chdir("D:\git\KR_FORGETTING")
 
-for file in glob.glob("exp*"):
-    os.system('java -cp lethe-standalone.jar uk.ac.man.cs.lethe.internal.application.ForgettingConsoleApplication --owlFile ' + inputOntology + ' --method ' + method  + ' --signature ' + signature)
+# Check if results directory exists, otherwise create it
+
+try:
+    os.makedirs("results")
+except OSError:
+    print ("Creation of the directory %s failed" % "results")
+else:
+    print ("Successfully created the directory %s " % "results")   
+
+for file in glob.glob("datasets/exp*"):
+    os.system('java -cp lethe-standalone.jar uk.ac.man.cs.lethe.internal.application.ForgettingConsoleApplication --owlFile ' + file + ' --method ' + method  + ' --signature ' + signature)
+    shutil.move("result.owl", "results/result.owl")
+    result_name = "results/" + file.split("\\")[1].split('.')[0] + ".owl"
+    os.rename("results/result.owl", result_name)
+    # TODO: rename results.owl file
+    # recheck for variables before you do lethe again
