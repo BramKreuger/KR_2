@@ -11,11 +11,12 @@ inputSubclassStatements = "datasets/subClasses.nt" # this file can be generated 
 # 3 - ALCOntologyForgetter
 method = "2" #
 
-# Choose the symbols which you want to forget.
-signature = "datasets/signature.txt"
-
 # Remove everything in the results folder
 def clean_directories():
+
+    # Remove results dir
+    shutil.rmtree("results")
+    
     # Check if results directory exists, otherwise create it
     try:
         os.makedirs("results")
@@ -23,9 +24,6 @@ def clean_directories():
         print ("Creation of the directory %s failed" % "results")
     else:
         print ("Successfully created the directory %s " % "results") 
-
-    for result_file in glob.glob("results/*"): # Remove everything in the results folder
-        os.remove(result_file)
 
     # Remove all eplanation files before beginning
     for file in glob.glob("datasets/exp*"):
@@ -77,30 +75,34 @@ def parseOMN(file):
     return result[:len(result) - 1] # remove the last element, which is always explanation some number
 
 # Flattens list, removes doubles, writes the vars into signature.txt
-def extract_varables(list_of_results):
-    flat_list = [item for sublist in list_of_results for item in sublist] # flatten   
-    list_wo_doubles = list(dict.fromkeys(flat_list)) 
-
-    if os.path.exists("signature.txt"):
-        os.remove("signature.txt")
+def write_variables_to_file(path, name, list_of_results):
+    #flat_list = [item for sublist in list_of_results for item in sublist] # flatten   
+    list_wo_doubles = list(dict.fromkeys(list_of_results))     
     
-    f = open("signature.txt", "w+")
+    var_counter = 1
     for var in list_wo_doubles:
+        f = open(path + name + "-var-" + str(var_counter) + ".txt", "w+")
         f.write(var + "\n")
-    f.close()
- 
-os.chdir("D:\git\KR_FORGETTING\datasets")
-all_parsed_results = []
-for file in glob.glob("exp*"):
-    all_parsed_results.append(parseOMN(file)) # Extract all the variables from the omn files
+        f.close()
+        var_counter += 1
 
-extract_varables(all_parsed_results) # TODO: extract variables per explanation and save every variable in a seperate file
-os.chdir("D:\git\KR_FORGETTING")
-
+# For each initial explanation
 for file in glob.glob("datasets/exp*"):
-    os.system('java -cp lethe-standalone.jar uk.ac.man.cs.lethe.internal.application.ForgettingConsoleApplication --owlFile ' + file + ' --method ' + method  + ' --signature ' + signature)
-    shutil.move("result.owl", "results/result.owl")
-    result_name = "results/" + "res-" + file.split("\\")[1].split('.')[0] + ".owl"
-    os.rename("results/result.owl", result_name)
-    # TODO: rename results.owl file
-    # recheck for variables before you do lethe again
+    file_name = file.split("\\")[1].split('.')[0]
+
+    # Now for each initial explanation, create a folder
+    os.makedirs("results/" + file_name)
+    new_file_path = "results/" + file_name + "/" + file_name + ".owl"
+    shutil.move(file, new_file_path)
+
+    parsed_vars = parseOMN(new_file_path)
+    write_variables_to_file("results/" + file_name + "/", file_name, parsed_vars)
+
+    # For each variable from the explanation
+    var_counter = 1
+    for var in glob.glob("results/" + file_name + "/*.txt"):
+        os.system('java -cp lethe-standalone.jar uk.ac.man.cs.lethe.internal.application.ForgettingConsoleApplication --owlFile ' + 
+        new_file_path + ' --method ' + method  + ' --signature ' + var)
+        shutil.move("result.owl", "results/" + file_name + "/" + file_name + "-result-" + str(var_counter) + ".owl")
+        var_counter += 1
+        # recheck for variables before you do lethe again
