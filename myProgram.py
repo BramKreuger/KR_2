@@ -14,11 +14,25 @@ method = "2" #
 # Choose the symbols which you want to forget.
 signature = "datasets/signature.txt"
 
-# Remove all eplanation files before beginning
-os.chdir("D:\git\KR_FORGETTING\datasets")
-for file in glob.glob("exp*"):
-    os.remove(file)
-os.chdir("D:\git\KR_FORGETTING")
+# Remove everything in the results folder
+def clean_directories():
+    # Check if results directory exists, otherwise create it
+    try:
+        os.makedirs("results")
+    except OSError:
+        print ("Creation of the directory %s failed" % "results")
+    else:
+        print ("Successfully created the directory %s " % "results") 
+
+    for result_file in glob.glob("results/*"): # Remove everything in the results folder
+        os.remove(result_file)
+
+    # Remove all eplanation files before beginning
+    for file in glob.glob("datasets/exp*"):
+        os.remove(file)
+    os.chdir("D:\git\KR_FORGETTING")    
+# Set up all the directories
+clean_directories()
 
 # 1. PRINT ALL SUBCLASSES (inputOntology):
 # print all subClass statements (explicit and inferred) in the inputOntology
@@ -39,13 +53,6 @@ os.system('java -jar kr_functions.jar ' + 'saveAllSubClasses' + " " + inputOntol
 # save explanations for each subClass statement in the inputSubclassStatements to file dataset/exp-#.owl
 # --> uncomment the following line to run this function
 os.system('java -jar kr_functions.jar ' + 'saveAllExplanations' + " " + inputOntology + " " + inputSubclassStatements)
-
-#for explanation in explanations:
-#    forgetOntology = "datasets/university-example.owl"
- #   for variable in variables:
-    # For running LETHE forget command:
-    # --> uncomment the following line to run this function
-#os.system('java -cp lethe-standalone.jar uk.ac.man.cs.lethe.internal.application.ForgettingConsoleApplication $*')
 
 def parseOMN(file):
     myfile = open(file, "rt")        # open lorem.txt for reading text
@@ -90,19 +97,10 @@ for file in glob.glob("exp*"):
 extract_varables(all_parsed_results) # TODO: extract variables per explanation and save every variable in a seperate file
 os.chdir("D:\git\KR_FORGETTING")
 
-# Check if results directory exists, otherwise create it
-
-try:
-    os.makedirs("results")
-except OSError:
-    print ("Creation of the directory %s failed" % "results")
-else:
-    print ("Successfully created the directory %s " % "results")   
-
 for file in glob.glob("datasets/exp*"):
     os.system('java -cp lethe-standalone.jar uk.ac.man.cs.lethe.internal.application.ForgettingConsoleApplication --owlFile ' + file + ' --method ' + method  + ' --signature ' + signature)
     shutil.move("result.owl", "results/result.owl")
-    result_name = "results/" + file.split("\\")[1].split('.')[0] + ".owl"
+    result_name = "results/" + "res-" + file.split("\\")[1].split('.')[0] + ".owl"
     os.rename("results/result.owl", result_name)
     # TODO: rename results.owl file
     # recheck for variables before you do lethe again

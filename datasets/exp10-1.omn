@@ -1,4 +1,3 @@
 Ontology(<http://www.example.com/explanation10>
-SubClassOf(<http://www.semanticweb.org/stefan/ontologies/2020/9/untitled-ontology-9#Q> ObjectIntersectionOf(<http://www.semanticweb.org/stefan/ontologies/2020/9/untitled-ontology-9#X> <http://www.semanticweb.org/stefan/ontologies/2020/9/untitled-ontology-9#Y>))
 SubClassOf(<http://www.semanticweb.org/stefan/ontologies/2020/9/untitled-ontology-9#Y> ObjectIntersectionOf(<http://www.semanticweb.org/stefan/ontologies/2020/9/untitled-ontology-9#R> ObjectComplementOf(<http://www.semanticweb.org/stefan/ontologies/2020/9/untitled-ontology-9#R>)))
 )
