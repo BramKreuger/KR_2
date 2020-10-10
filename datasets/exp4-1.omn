@@ -1,4 +1,5 @@
-Ontology(<http://www.example.com/explanation1>
+Ontology(<http://www.example.com/explanation4>
+SubClassOf(<http://www.semanticweb.org/sheep/ontologies/2020/9/untitled-ontology-9#F> <http://www.semanticweb.org/sheep/ontologies/2020/9/untitled-ontology-9#E>)
 SubClassOf(<http://www.semanticweb.org/sheep/ontologies/2020/9/untitled-ontology-9#D> <http://www.semanticweb.org/sheep/ontologies/2020/9/untitled-ontology-9#C>)
 SubClassOf(<http://www.semanticweb.org/sheep/ontologies/2020/9/untitled-ontology-9#E> <http://www.semanticweb.org/sheep/ontologies/2020/9/untitled-ontology-9#D>)
 )
