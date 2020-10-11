@@ -1,6 +1,10 @@
 import os, glob, re, shutil, sys
+import subprocess, time
 
-inputOntology = "datasets/simple-4deep.owl"
+# Start timing 
+start = time.perf_counter()
+
+inputOntology = "datasets/university-example.owl"
 
 inputSubclassStatements = "datasets/subClasses.nt" # this file can be generated using the second command (saveAllSubClasses)
 
@@ -45,7 +49,8 @@ clean_directories()
 # 2. SAVE ALL SUBCLASSES (inputOntology):
 # save all subClass statements (explicit and inferred) in the inputOntology to file datasets/subClasses.nt
 # --> uncomment the following line to run this function
-os.system('java -jar kr_functions.jar ' + 'saveAllSubClasses' + " " + inputOntology)
+#os.system('java -jar kr_functions.jar ' + 'saveAllSubClasses' + " " + inputOntology)
+subprocess.Popen('java -jar kr_functions.jar ' + 'saveAllSubClasses' + " " + inputOntology, shell=True, stdout=subprocess.DEVNULL).wait()
 
 # 3. PRINT ALL EXPLANATIONS (inputOntology, inputSubclassStatements):
 # print explanations for each subClass statement in the inputSubclassStatements
@@ -55,8 +60,9 @@ os.system('java -jar kr_functions.jar ' + 'saveAllSubClasses' + " " + inputOntol
 # 4. SAVE ALL EXPLANATIONS (inputOntology, inputSubclassStatements):
 # save explanations for each subClass statement in the inputSubclassStatements to file dataset/exp-#.owl
 # --> uncomment the following line to run this function
-os.system('java -jar kr_functions.jar ' + 'saveAllExplanations' + " " + inputOntology + " " + inputSubclassStatements)
+subprocess.Popen('java -jar kr_functions.jar ' + 'saveAllExplanations' + " " + inputOntology + " " + inputSubclassStatements, shell=True, stdout=subprocess.DEVNULL).wait()
 
+# extract all the variables which aren't neccecery for entailment
 def parseOMN(file):
     myfile = open(file, "rt")        # open lorem.txt for reading text
     contents = myfile.read()         # read the entire file to string
@@ -76,8 +82,41 @@ def parseOMN(file):
                     result += result_character
                 else:
                     break
-    result = ((result[::-1])[:len(result) - 1]).split('>') # Reverse the strings back, remove the last '>', split the vars on '>'
-    return result[:len(result) - 1] # remove the last element, which is always explanation some number
+    # Reverse the strings back, remove the last '>', split the vars on '>'
+    result = ((result[::-1])[:len(result) - 1]).split('>') 
+    # remove the last element, which is always explanation some number and finaly reverse the list
+    list_with_single_elements = (result[:len(result) - 1])[::-1] 
+
+    list_with_tuples = []
+    for i in range(0, len(list_with_single_elements), 2):
+        list_with_tuples.append( (list_with_single_elements[i], list_with_single_elements[i + 1]) )
+
+    # list_with_tuples is the bag
+    ordered_list_with_tuples = [list_with_tuples[0]]
+    list_with_tuples.remove(list_with_tuples[0]) 
+
+    # if there are still elements in the bag
+    while(len(list_with_tuples) > 0): 
+        for tup in list_with_tuples:
+            # Is the second variable of the last tuple the same as the first var of tup?
+            if(ordered_list_with_tuples[-1][1] == tup[0]):
+                ordered_list_with_tuples.append(tup)
+                list_with_tuples.remove(tup)
+                break
+            # Is the first variable of the first tuple the same as the second var of tup?
+            elif(ordered_list_with_tuples[0][0] == tup[1]):
+                ordered_list_with_tuples.insert(0, tup)
+                list_with_tuples.remove(tup)
+                break
+
+    variables_to_forget = [ordered_list_with_tuples[0][1], ordered_list_with_tuples[-1][0]]
+    if( len(ordered_list_with_tuples) > 1):
+        for tup in ordered_list_with_tuples[1:-1]:
+            variables_to_forget.append(tup[0])
+            variables_to_forget.append(tup[1])
+
+    print("Entailment:", ordered_list_with_tuples[0][0].split('/')[-1], " TO ", ordered_list_with_tuples[-1][1].split('/')[-1])
+    return variables_to_forget
 
 # Flattens list, removes doubles, writes the vars into signature.txt
 def write_variables_to_file(path, name, list_of_results):
@@ -110,13 +149,12 @@ def forget_explanation(new_file_path, method, var_counter):
 
 
             # Run Save subclasses and explanations on the new .owl file
-            os.system('java -jar kr_functions.jar ' + 'saveAllSubClasses' + " " + file)
-            os.system('java -jar kr_functions.jar ' + 'saveAllExplanations' + " " + file + " " + inputSubclassStatements)
+            subprocess.Popen('java -jar kr_functions.jar ' + 'saveAllSubClasses' + " " + file, shell=True, stdout=subprocess.DEVNULL).wait()
+            subprocess.Popen('java -jar kr_functions.jar ' + 'saveAllExplanations' + " " + file + " " + inputSubclassStatements, shell=True, stdout=subprocess.DEVNULL).wait()
 
             # Move all .omn file to respective folder
             omn_counter = 1
             for omn_file in glob.glob(new_file_path + "/*.omn"):
-                #os.makedirs(newest_file_path + "/" + str(omn_counter))
                 new_omn_file_path = newest_file_path + "/" + str(omn_counter) + ".omn"
                 shutil.move(omn_file, new_omn_file_path)
 
@@ -127,15 +165,15 @@ def forget_explanation(new_file_path, method, var_counter):
 
                 # For each variable from the explanation
                 for var in glob.glob(newest_file_path + "/*.txt"):
-                    os.system('java -cp lethe-standalone.jar uk.ac.man.cs.lethe.internal.application.ForgettingConsoleApplication --owlFile ' + 
-                    new_omn_file_path + ' --method ' + method  + ' --signature ' + var)
+                    subprocess.Popen('java -cp lethe-standalone.jar uk.ac.man.cs.lethe.internal.application.ForgettingConsoleApplication --owlFile ' + 
+                    new_omn_file_path + ' --method ' + method  + ' --signature ' + var, shell=True, stdout=subprocess.DEVNULL).wait()
                     shutil.move("result.owl", newest_file_path + "/result-" + str(var_counter) + ".owl")
 
                 # Extract one from the var counter because it starts with 1 for naming pourposes
-                if(new_var_counter < var_counter - 1):
-                    forget_explanation(newest_file_path, method, var_counter - 1) 
-                else:
-                    break
+                #if(new_var_counter < var_counter - 1):
+                forget_explanation(newest_file_path, method, var_counter - 1) 
+                #else:
+                #    break
 
                 omn_counter += 1
             
@@ -157,8 +195,8 @@ for file in glob.glob("datasets/exp*"):
     # For each variable from the explanation
     var_counter = 1
     for var in glob.glob("results/" + file_name + "/*.txt"):
-        os.system('java -cp lethe-standalone.jar uk.ac.man.cs.lethe.internal.application.ForgettingConsoleApplication --owlFile ' + 
-        new_file_path + ' --method ' + method  + ' --signature ' + var)
+        subprocess.Popen('java -cp lethe-standalone.jar uk.ac.man.cs.lethe.internal.application.ForgettingConsoleApplication --owlFile ' + 
+        new_file_path + ' --method ' + method  + ' --signature ' + var, shell=True, stdout=subprocess.DEVNULL).wait()
         shutil.move("result.owl", "results/" + file_name + "/result-" + str(var_counter) + ".owl")
         var_counter += 1
 
@@ -186,5 +224,10 @@ def removeEmptyFolders(path, removeRoot=True):
     
 removeEmptyFolders("results", False)
 
+finish = time.perf_counter()
 
-    # recheck for variables before you do lethe again
+print(f"Finished in {finish - start:0.4f} seconds")
+
+# TODO: Forgetting the right variables. Which aren't neccecery for entailment
+# TODO: Implementing heuristics
+

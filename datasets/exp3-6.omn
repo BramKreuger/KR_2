@@ -1,0 +1,4 @@
+Ontology(<http://www.example.com/explanation3>
+SubClassOf(<http://www.co-ode.org/ontologies/pizza/pizza.owl#Veneziana> ObjectSomeValuesFrom(<http://www.co-ode.org/ontologies/pizza/pizza.owl#hasTopping> <http://www.co-ode.org/ontologies/pizza/pizza.owl#OliveTopping>))
+ObjectPropertyDomain(<http://www.co-ode.org/ontologies/pizza/pizza.owl#hasTopping> <http://www.co-ode.org/ontologies/pizza/pizza.owl#Pizza>)
+)
