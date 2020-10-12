@@ -1,10 +1,10 @@
-import os, glob, re, shutil, sys
+import os, glob, re, shutil, sys, copy
 import subprocess, time
 
 # Start timing 
 start = time.perf_counter()
 
-inputOntology = "datasets/university-example.owl"
+inputOntology = "datasets/simple-4deep.owl"
 
 inputSubclassStatements = "datasets/subClasses.nt" # this file can be generated using the second command (saveAllSubClasses)
 
@@ -62,69 +62,61 @@ subprocess.Popen('java -jar kr_functions.jar ' + 'saveAllSubClasses' + " " + inp
 # --> uncomment the following line to run this function
 subprocess.Popen('java -jar kr_functions.jar ' + 'saveAllExplanations' + " " + inputOntology + " " + inputSubclassStatements, shell=True, stdout=subprocess.DEVNULL).wait()
 
-# extract all the variables which aren't neccecery for entailment
-def parseOMN(file):
-    myfile = open(file, "rt")        # open lorem.txt for reading text
-    contents = myfile.read()         # read the entire file to string
-    myfile.close()                   # close the file
+# New extraction steps
+# 1. Read subClasses.nt -> extract two variables
+# 2. From exp.omn extract all variables
+# 3. From all variables subract two variables
 
-    # 1. loop through string to find >
-    # 2. loop back to find first <, 
-    # 4. repeat
+def parseOMN(subClasses_file, omn_file):
+    # STEP 1.
 
-    split_position = 0
-    result = ""
-    for pointer in contents:
-        split_position += 1 
-        if pointer == '>':
-            for result_character in reversed(contents[:split_position]):
-                if(not result_character == '<'):
-                    result += result_character
-                else:
-                    break
-    # Reverse the strings back, remove the last '>', split the vars on '>'
-    result = ((result[::-1])[:len(result) - 1]).split('>') 
-    # remove the last element, which is always explanation some number and finaly reverse the list
-    list_with_single_elements = (result[:len(result) - 1])[::-1] 
+    myfile = open(subClasses_file, "rt")  # open lorem.txt for reading text
+    contents = myfile.read()              # read the entire file to string
+    myfile.close()                        # close the file
 
-    list_with_tuples = []
-    for i in range(0, len(list_with_single_elements), 2):
-        list_with_tuples.append( (list_with_single_elements[i], list_with_single_elements[i + 1]) )
+    contents = contents.split(' .\n')[:-1]
+    entailment_variables = []
+    for line in contents:
+        split_position = 0
+        result = ""
+        found_arrow = False
+        for pointer in line:
+            split_position += 1         
+            if pointer == '<':  
+                found_arrow = True          
+            if(not pointer == '>' and found_arrow == True):
+                result += pointer
+            else:
+                found_arrow = False
+        # Reverse the strings back, remove the last '>', split the vars on '>'
+        split_result = result.split('<')
+        #print("Entailment:", split_result[1], " to ", split_result[3])
+        entailment_variables.append([split_result[1], split_result[3]])
 
-    # list_with_tuples is the bag
-    ordered_list_with_tuples = [list_with_tuples[0]]
-    list_with_tuples.remove(list_with_tuples[0]) 
+    # STEP 2.
 
-    # if there are still elements in the bag
-    while(len(list_with_tuples) > 0): 
-        for tup in list_with_tuples:
-            # Is the second variable of the last tuple the same as the first var of tup?
-            if(ordered_list_with_tuples[-1][1] == tup[0]):
-                ordered_list_with_tuples.append(tup)
-                list_with_tuples.remove(tup)
-                break
-            # Is the first variable of the first tuple the same as the second var of tup?
-            elif(ordered_list_with_tuples[0][0] == tup[1]):
-                ordered_list_with_tuples.insert(0, tup)
-                list_with_tuples.remove(tup)
-                break
+    myfile = open(omn_file, "rt") # open lorem.txt for reading text
+    contents = myfile.read()      # read the entire file to string
+    myfile.close() 
 
-    variables_to_forget = [ordered_list_with_tuples[0][1], ordered_list_with_tuples[-1][0]]
-    if( len(ordered_list_with_tuples) > 1):
-        for tup in ordered_list_with_tuples[1:-1]:
-            variables_to_forget.append(tup[0])
-            variables_to_forget.append(tup[1])
+    all_variables = []
+    split_contents = contents.split(">")[1:-1]
+    for line in split_contents:
+        all_variables.append(line.split("<")[1])
 
-    print("Entailment:", ordered_list_with_tuples[0][0].split('/')[-1], " TO ", ordered_list_with_tuples[-1][1].split('/')[-1])
-    return variables_to_forget
+    # STEP 3.
+    list_wo_doubles = list(dict.fromkeys(all_variables))    
+    return list_wo_doubles, entailment_variables
 
-# Flattens list, removes doubles, writes the vars into signature.txt
-def write_variables_to_file(path, name, list_of_results):
-    #flat_list = [item for sublist in list_of_results for item in sublist] # flatten   
-    list_wo_doubles = list(dict.fromkeys(list_of_results))     
-    
-    var_counter = 1
-    for var in list_wo_doubles:
+# writes the vars into signature.txt
+def write_variables_to_file(path, name, all_variables, entailment_variables, which_line):    
+    variables_to_forget = copy.deepcopy(all_variables)
+    for var in all_variables:
+        if(var == entailment_variables[which_line][0] or var == entailment_variables[which_line][1]):
+            variables_to_forget.remove(var)
+     
+    var_counter = 0
+    for var in variables_to_forget:
         f = open(path + name + "-var-" + str(var_counter) + ".txt", "w+")
         f.write(var + "\n")
         f.close()
@@ -155,11 +147,12 @@ def forget_explanation(new_file_path, method, var_counter):
             # Move all .omn file to respective folder
             omn_counter = 1
             for omn_file in glob.glob(new_file_path + "/*.omn"):
-                new_omn_file_path = newest_file_path + "/" + str(omn_counter) + ".omn"
+                new_omn_file_path  = newest_file_path + "/" + str(omn_counter) + ".omn"
+                new_sublasses_path = new_file_path + "/subClasses.nt"
                 shutil.move(omn_file, new_omn_file_path)
 
-                parsed_vars = parseOMN(new_omn_file_path)
-                write_variables_to_file(newest_file_path + "/", str(omn_counter), parsed_vars)
+                parsed_vars, entailment_variables = parseOMN(new_sublasses_path, new_omn_file_path)
+                write_variables_to_file(newest_file_path + "/", str(omn_counter), parsed_vars, entailment_variables, omn_counter - 1)
 
                 new_var_counter = len(parsed_vars)
 
@@ -170,18 +163,15 @@ def forget_explanation(new_file_path, method, var_counter):
                     shutil.move("result.owl", newest_file_path + "/result-" + str(var_counter) + ".owl")
 
                 # Extract one from the var counter because it starts with 1 for naming pourposes
-                #if(new_var_counter < var_counter - 1):
                 forget_explanation(newest_file_path, method, var_counter - 1) 
-                #else:
-                #    break
 
                 omn_counter += 1
             
             owl_counter += 1
 
 # For each initial explanation
+exp_cntr = 0
 for file in glob.glob("datasets/exp*"):
-    #file = "datasets\\exp1-1.omn"
     file_name = file.split("\\")[1].split('.')[0]
 
     # Now for each initial explanation, create a folder
@@ -189,8 +179,8 @@ for file in glob.glob("datasets/exp*"):
     new_file_path = "results/" + file_name + "/" + file_name + ".owl"
     shutil.move(file, new_file_path)
 
-    parsed_vars = parseOMN(new_file_path)
-    write_variables_to_file("results/" + file_name + "/", file_name, parsed_vars)
+    parsed_vars, entailment_variables = parseOMN("datasets/subClasses.nt", new_file_path)
+    write_variables_to_file("results/" + file_name + "/", file_name, parsed_vars, entailment_variables, exp_cntr)
 
     # For each variable from the explanation
     var_counter = 1
@@ -202,6 +192,7 @@ for file in glob.glob("datasets/exp*"):
 
     # Go in the recursive forgetter, Only if there are more then two variables
     forget_explanation("results/" + file_name, method, var_counter)
+    exp_cntr += 1
 
 def removeEmptyFolders(path, removeRoot=True):
   'Function to remove empty folders'

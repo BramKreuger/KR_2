@@ -1,4 +1,4 @@
 Ontology(<http://www.example.com/explanation6>
-ObjectPropertyDomain(<http://www.co-ode.org/ontologies/pizza/pizza.owl#hasTopping> <http://www.co-ode.org/ontologies/pizza/pizza.owl#Pizza>)
-SubClassOf(<http://www.co-ode.org/ontologies/pizza/pizza.owl#Cajun> ObjectSomeValuesFrom(<http://www.co-ode.org/ontologies/pizza/pizza.owl#hasTopping> <http://www.co-ode.org/ontologies/pizza/pizza.owl#TobascoPepperSauce>))
+SubClassOf(<http://www.semanticweb.org/sheep/ontologies/2020/9/untitled-ontology-10#C> <http://www.semanticweb.org/sheep/ontologies/2020/9/untitled-ontology-10#B>)
+SubClassOf(<http://www.semanticweb.org/sheep/ontologies/2020/9/untitled-ontology-10#D> <http://www.semanticweb.org/sheep/ontologies/2020/9/untitled-ontology-10#C>)
 )

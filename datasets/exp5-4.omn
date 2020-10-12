@@ -1,4 +1,0 @@
-Ontology(<http://www.example.com/explanation5>
-SubClassOf(<http://www.co-ode.org/ontologies/pizza/pizza.owl#Caprina> ObjectSomeValuesFrom(<http://www.co-ode.org/ontologies/pizza/pizza.owl#hasTopping> <http://www.co-ode.org/ontologies/pizza/pizza.owl#SundriedTomatoTopping>))
-ObjectPropertyDomain(<http://www.co-ode.org/ontologies/pizza/pizza.owl#hasTopping> <http://www.co-ode.org/ontologies/pizza/pizza.owl#Pizza>)
-)
