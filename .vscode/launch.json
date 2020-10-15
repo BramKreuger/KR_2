@@ -11,7 +11,7 @@
             "program": "${file}",
             "args": [
                 "result",
-                "datasets/simple-4deep.owl",
+                "datasets/pizza_super_simple.owl",
                 "1",
                 "True"
             ],

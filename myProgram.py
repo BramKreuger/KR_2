@@ -93,8 +93,8 @@ def writeVariablesToFile(path, name, all_variables, entailment_variables, which_
     elif(heuristic == 2): # LOV
         ordered_variables = [item for items, c in Counter(all_variables).most_common() for item in [items] * c] 
         ordered_variables[::-1]
-    else:                 # Extensive search
-        ordered_variables = list(dict.fromkeys(all_variables))
+    else:                 # random var
+        ordered_variables = all_variables
 
     variables_to_forget = copy.deepcopy(ordered_variables)
     # Check if variables are not in entailment
@@ -103,6 +103,8 @@ def writeVariablesToFile(path, name, all_variables, entailment_variables, which_
 
     # If the heuristic is 1 or 2, pick the first eligable LOV / MOV
     if(heuristic != 3 and len(variables_to_forget) > 0): 
+        variables_to_forget = [variables_to_forget[0]]
+    elif(len(variables_to_forget) > 0): 
         rand_int = random.randint(0, len(variables_to_forget) - 1)
         variables_to_forget = [variables_to_forget[rand_int]]
 
@@ -310,7 +312,7 @@ def main():
     parser.add_argument('ontology', metavar='O', type=str,
                     help='filename of the ontology to load') 
     parser.add_argument('heuristic', metavar='H', type=int, choices=[1, 2, 3],
-                    help='Which heuristic to run. 1: LOV, 2: MOV, 3: Extensive')
+                    help='Which heuristic to run. 1: LOV, 2: MOV, 3: Random var')
     parser.add_argument('generate', metavar='C', type=boolean_string,
                     help='True: GNERATE all files and calculate complexity. False: ONLY calculate complexity')              
     args = parser.parse_args()
